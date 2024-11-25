@@ -77,6 +77,178 @@ npm start
 !дольжен у тебя эмулятор или Установите Expo Go на своем телефоне (доступно в App Store/Google Play).
 Отсканируйте QR-код для запуска приложения на устройстве.
 
+Создание компонента в React Native включает использование компонентов управления состоянием и рендеринга, таких как TextInput (для ручного ввода), Button (для увеличения и уменьшения) и оболочки макета (View со стилями, похожими на Column и Row в Jetpack Compose).
+
+1. App Component
+
+```bash
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Counter />
+    </View>
+  );
+}
+```
+использует контейнер <View>, стилизованный с помощью styles.container, чтобы выровнять элементы по центру,
+ добавить отступы и установить черный фон.
+Внутри рендерится компонент <Counter />, который отвечает за основную функциональность приложения
+
+2. Counter Component
+```bash
+const Counter = () => {
+  const [counterValue, setCounterValue] = useState(0);
+
+  const handleInputChange = (value) => {
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue)) {
+      setCounterValue(parsedValue);
+    }
+  };
+
+```
+
+Управление состоянием
+
+    counterValue: Хранит текущее значение счетчика.
+    setCounterValue: Обновляет состояние counterValue.
+    Изначальное значение — 0, установлено через хук useState.
+
+Обработка ввода
+
+    handleInputChange:
+        Получает введенное значение как строку из компонента <TextInput>.
+        Преобразует строку в число с помощью parseInt.
+        Если введенное значение является числом (!isNaN(parsedValue)), обновляет состояние counterValue
+
+UI Elements in Counter
+```bash
+<View style={styles.card}>
+  <View style={styles.column}>
+    <TextInput
+      style={styles.input}
+      value={counterValue.toString()}
+      onChangeText={handleInputChange}
+      keyboardType="numeric"
+      placeholder="Enter a number"
+      placeholderTextColor="#aaa"
+    />
+```
+<TextInput>:
+- Поле для ввода текста, стилизованное через styles.input.
+- Показывает текущее значение counterValue в виде строки.
+- При изменении текста вызывает функцию handleInputChange для обновления состояния.
+
+```bash
+<View style={styles.row}>
+  <Button title="Increase" onPress={() => setCounterValue(counterValue + 1)} />
+  <Button title="Decrease" onPress={() => setCounterValue(counterValue - 1)} />
+</View>
+```
+    <Button>:
+        Два кнопки:
+            "Increase": Увеличивает значение счетчика на 1.
+            "Decrease": Уменьшает значение счетчика на 1.
+        Обработчики событий onPress обновляют состояние counterValue через setCounterValue.
+
+```bash
+<Text style={styles.text}>Current value: {counterValue}</Text>
+```
+<Text>:
+
+    Отображает текущее значение счетчика под кнопками.
+    Стилизован через styles.text.
+
+```bash
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Counter />
+    </View>
+  );
+}
+
+const Counter = () => {
+  const [counterValue, setCounterValue] = useState(0);
+
+  const handleInputChange = (value) => {
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue)) {
+      setCounterValue(parsedValue);
+    }
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.column}>
+        <TextInput
+          style={styles.input}
+          value={counterValue.toString()}
+          onChangeText={handleInputChange}
+          keyboardType="numeric"
+          placeholder="Enter a number"
+          placeholderTextColor="#aaa"
+        />
+
+        <View style={styles.row}>
+          <Button title="Increase" onPress={() => setCounterValue(counterValue + 1)} />
+          <Button title="Decrease" onPress={() => setCounterValue(counterValue - 1)} />
+        </View>
+
+        <Text style={styles.text}>Current value: {counterValue}</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000', 
+    padding: 20,
+    alignItems: 'center', 
+  },
+  card: {
+    width: '90%', 
+    marginTop: 40, 
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#222', 
+    elevation: 3, 
+    shadowColor: '#000', 
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    width: '80%',
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    color: '#000', 
+    marginBottom: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginVertical: 10,
+  },
+  column: {
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 16,
+    marginVertical: 10,
+    color: '#fff', 
+  },
+});
+```
+![expo](Resources/10.png)
 
 
 ## 4. Добавление зависимостей
