@@ -51,7 +51,7 @@ npx expo prebuild
 [Android Studio](https://developer.android.com/studio/run/emulator)
 
 ## 2. Структура проекта
-
+<pre>
 MyReactNativeApp/
 │
 ├── android/                # Каталог с нативным Android-кодом (сгенерировано prebuild)
@@ -63,7 +63,7 @@ MyReactNativeApp/
 ├── index.js                # Точка входа приложения
 ├── package.json            # Метаданные проекта и список зависимостей
 ├── package-lock.json       # Зафиксированные версии зависимостей
-
+</pre>
 
 ## 3. Первый запуск
 - Запустите приложение:
@@ -409,6 +409,7 @@ json-server --watch db.json --port 3000
 ```
 
 Итоговая структура проекта
+<pre>
 src/
 ├── api/
 │   └── api.js
@@ -417,7 +418,7 @@ src/
 ├── screens/
 │   └── HomeScreen.js
 ├── App.js
-
+</pre>
 Итого
 1.Сервер возвращает данные (например, json-server).
 2.api.js управляет запросами.
