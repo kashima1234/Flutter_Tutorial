@@ -500,7 +500,7 @@ class MyApp extends StatelessWidget {
 
 # создать корзина
 
-создаем cart_screen.dart
+создаем <code>cart_screen.dart</code>
 
 ```bash
 import 'package:flutter/material.dart';
@@ -694,3 +694,44 @@ class DeviceDetailScreen extends StatelessWidget {
 ![f](Resources/8.png)
 ![f](Resources/9.png)
 ![f](Resources/10.png)
+
+
+
+## Сохранение Flutter-приложения в виде APK-файла 
+
+Проверка окружения
+
+Убедитесь, что у вас установлены все необходимые инструменты для сборки Android-приложений:
+
+Android Studio (с установленным SDK).
+Flutter SDK.
+Правильно настроенные переменные окружения (flutter и adb должны быть доступны в терминале).
+
+Проверьте работоспособность Flutter и Android SDK командой:
+
+```bash
+flutter doctor
+```
+
+Все пункты должны быть отмечены зелёным.
+
+### Сборка APK в режиме Release
+
+APK-файл для публикации нужно собирать в режиме release, чтобы исключить отладочные функции и улучшить производительность.
+
+Выполните следующую команду:
+
+```bash
+flutter build apk --release
+```
+
+После успешной сборки APK будет находиться в папке:
+
+<code>build/app/outputs/flutter-apk/app-release.apk</code>
+
+
+![f](Resources/11.png)
+![f](Resources/12.png)
+![f](Resources/13.png)
+![f](Resources/14.png)
+![f](Resources/15.png)
