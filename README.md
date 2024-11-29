@@ -1,516 +1,537 @@
-# Методические указания по выполнению задания для платформы React Native
-
-## План
-
-1. [Создание проекта](#создание-проекта)
-2. [Структура проекта](#структура-проекта)
-3. [Первый запуск](#первый-запуск)
-4. [Добавление зависимостей](#добавление-зависимостей)
-5. [Создание API](#создание-api)
-6. [Создание Views](#создание-views)
+# Методические указания для Flutter
 
 
-## 1. Создание проекта
+##  Установите редактор кода
+- **Рекомендуется**: [Visual Studio Code](https://code.visualstudio.com/) или [Android Studio](https://developer.android.com/studio).
+  - Для **VS Code**: Установите расширения **Flutter** и **Dart**.
+  - Для **Android Studio**: Установите плагины **Flutter** и **Dart** через раздел **Plugins**.
 
-### Установка окружения
-1- Убедитесь, что Node.js установлен на вашем компьютере.
-Скачать можно с официального сайта Node.js.
-2- Установите Expo CLI глобально:
+---
 
+
+
+## 4. Проверьте установку Flutter
+Запустите команду:
 ```bash
-npm install -g expo-cli
-or 
-sudo install -g expo-cli
+flutter doctor
 ```
-3- Создайте новый проект:
+![f](Resources/1.png)
 
+
+# 1. Создание проекта
+
+*В командной строке создайте новый проект:*
 ```bash
-expo init MyReactNativeApp
+flutter create shopingapp
 ```
-При создании выберите шаблон (например, blank).
-
-![expo](Resources/1.png)
-![expo](Resources/2.png)
-
-
-4- Перейдите в папку проекта:
+*Перейдите в папку проекта:*
 ```bash
-cd MyReactNativeApp
+cd shopingapp
 ```
 
-
-потому что мы использовали expo, поэтому у нас нет файлов для android и ios, поэтому нам нужно npx, чтобы разобраться с ними
+**Запустите приложение Flutter**
 
 ```bash
-npx expo prebuild
+flutter run
 ```
-![expo](Resources/3.png)
-                                                                                                         
-Дальше установите и настройте эмулятор на android studio
 
-[Android Studio](https://developer.android.com/studio/run/emulator)
+![f](Resources/2.png)
 
-## 2. Структура проекта
+У вас будет список доступных устройств, на которых можно запустить приложение Flutter:
+
+    Linux (desktop): Ваше приложение будет запущено как настольное приложение для Linux.
+    Chrome (web): Ваше приложение будет запущено как веб-приложение в браузере Google Chrome.
+
+выберите 1
+
+![f](Resources/3.png)
+
+
+
+Создаем папку screens, в ней создадим две страницы – главную страницу магазина(shop_screen.dart) и страницу товара(device_screen.dart)
+
+```bash
+shop_screen.dart
+```
+
+```bash
+import 'package:flutter/material.dart';
+
+class ShopScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Shop')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            // Navigate to the DeviceScreen
+            Navigator.pushNamed(context, '/device');
+          },
+          child: Text('Go to device screen'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+
+```bash
+device_screen.dart
+```
+
+```bash
+import 'package:flutter/material.dart';
+
+class DeviceScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('DeviceScreen')),
+      body: Center(
+        child: Text('DeviceScreen'),
+      ),
+    );
+  }
+}
+```
+
+Обновите файл main.dart:
+
+В файле main.dart настройте навигацию с помощью Navigator и MaterialPageRoute,
+
+```bash
+import 'package:flutter/material.dart';
+import 'screens/shop_screen.dart';
+import 'screens/device_screen.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Shopping App',
+      initialRoute: '/shop', 
+      routes: {
+        '/shop': (context) => ShopScreen(),
+        '/device': (context) => DeviceScreen(),
+      },
+    );
+  }
+}
+```
+![f](Resources/r1.png)
+
+
+Структура каталога
+
 <pre>
-MyReactNativeApp/
-│
-├── android/                # Каталог с нативным Android-кодом (сгенерировано prebuild)
-├── ios/                    # Каталог с нативным iOS-кодом (сгенерировано prebuild)
-├── assets/                 # Папка для статических ресурсов (изображения, шрифты и т.д.)
-├── node_modules/           # Зависимости проекта (автоматически устанавливается npm/yarn)
-├── App.js                  # Основной компонент приложения
-├── app.json                # Конфигурация Expo
-├── index.js                # Точка входа приложения
-├── package.json            # Метаданные проекта и список зависимостей
-├── package-lock.json       # Зафиксированные версии зависимостей
+lib/
+  screens/
+    shop_screen.dart
+    device_screen.dart
+  main.dart
 </pre>
 
-## 3. Первый запуск
-- Запустите приложение:
+Теперь
+
+создаем store.dart
 
 ```bash
-npm start
-```
+class AppState {
+  final List<Device> devices;    
+  final Device? selectedDevice; 
 
-![expo](Resources/4.png)
-
-!дольжен у тебя эмулятор или Установите Expo Go на своем телефоне (доступно в App Store/Google Play).
-Отсканируйте QR-код для запуска приложения на устройстве.
-
-Создание компонента в React Native включает использование компонентов управления состоянием и рендеринга, таких как TextInput (для ручного ввода), Button (для увеличения и уменьшения) и оболочки макета (View со стилями, похожими на Column и Row в Jetpack Compose).
-
-1. App Component
-
-```bash
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Counter />
-    </View>
-  );
+  AppState({required this.devices, this.selectedDevice});
 }
 ```
-использует контейнер <View>, стилизованный с помощью styles.container, чтобы выровнять элементы по центру,
- добавить отступы и установить черный фон.
-Внутри рендерится компонент <Counter />, который отвечает за основную функциональность приложения
+AppState описывает структуру состояния приложения:
 
-2. Counter Component
-```bash
-const Counter = () => {
-  const [counterValue, setCounterValue] = useState(0);
+    devices: Список всех доступных устройств.
+    selectedDevice: Одно устройство, которое выбрано пользователем (может быть null).
 
-  const handleInputChange = (value) => {
-    const parsedValue = parseInt(value, 10);
-    if (!isNaN(parsedValue)) {
-      setCounterValue(parsedValue);
-    }
-  };
-
-```
-
-Управление состоянием
-
-    counterValue: Хранит текущее значение счетчика.
-    setCounterValue: Обновляет состояние counterValue.
-    Изначальное значение — 0, установлено через хук useState.
-
-Обработка ввода
-
-    handleInputChange:
-        Получает введенное значение как строку из компонента <TextInput>.
-        Преобразует строку в число с помощью parseInt.
-        Если введенное значение является числом (!isNaN(parsedValue)), обновляет состояние counterValue
-
-UI Elements in Counter
-```bash
-<View style={styles.card}>
-  <View style={styles.column}>
-    <TextInput
-      style={styles.input}
-      value={counterValue.toString()}
-      onChangeText={handleInputChange}
-      keyboardType="numeric"
-      placeholder="Enter a number"
-      placeholderTextColor="#aaa"
-    />
-```
-<TextInput>:
-- Поле для ввода текста, стилизованное через styles.input.
-- Показывает текущее значение counterValue в виде строки.
-- При изменении текста вызывает функцию handleInputChange для обновления состояния.
 
 ```bash
-<View style={styles.row}>
-  <Button title="Increase" onPress={() => setCounterValue(counterValue + 1)} />
-  <Button title="Decrease" onPress={() => setCounterValue(counterValue - 1)} />
-</View>
-```
-    <Button>:
-        Два кнопки:
-            "Increase": Увеличивает значение счетчика на 1.
-            "Decrease": Уменьшает значение счетчика на 1.
-        Обработчики событий onPress обновляют состояние counterValue через setCounterValue.
+class SetDevicesAction {
+  final List<Device> devices;
 
-```bash
-<Text style={styles.text}>Current value: {counterValue}</Text>
-```
-<Text>:
-
-    Отображает текущее значение счетчика под кнопками.
-    Стилизован через styles.text.
-
-```bash
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
-
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Counter />
-    </View>
-  );
+  SetDevicesAction(this.devices);
 }
-
-const Counter = () => {
-  const [counterValue, setCounterValue] = useState(0);
-
-  const handleInputChange = (value) => {
-    const parsedValue = parseInt(value, 10);
-    if (!isNaN(parsedValue)) {
-      setCounterValue(parsedValue);
-    }
-  };
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.column}>
-        <TextInput
-          style={styles.input}
-          value={counterValue.toString()}
-          onChangeText={handleInputChange}
-          keyboardType="numeric"
-          placeholder="Enter a number"
-          placeholderTextColor="#aaa"
-        />
-
-        <View style={styles.row}>
-          <Button title="Increase" onPress={() => setCounterValue(counterValue + 1)} />
-          <Button title="Decrease" onPress={() => setCounterValue(counterValue - 1)} />
-        </View>
-
-        <Text style={styles.text}>Current value: {counterValue}</Text>
-      </View>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000', 
-    padding: 20,
-    alignItems: 'center', 
-  },
-  card: {
-    width: '90%', 
-    marginTop: 40, 
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor: '#222', 
-    elevation: 3, 
-    shadowColor: '#000', 
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    width: '80%',
-    borderRadius: 5,
-    backgroundColor: '#fff',
-    color: '#000', 
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginVertical: 10,
-  },
-  column: {
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 16,
-    marginVertical: 10,
-    color: '#fff', 
-  },
-});
 ```
-![expo](Resources/10.png)
 
+Экшен — это класс, описывающий действие, которое нужно выполнить с состоянием.
+SetDevicesAction:
 
-## 4. Добавление зависимостей
-
-Основные зависимости:
-
-- Установите навигацию:
-```bash
-npm install @react-navigation/native react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated react-native-vector-icons
-```
-![expo](Resources/5.png)
-
-
-
-Установите Redux (если нужно управление состоянием):
-
-```bash 
-npm install @reduxjs/toolkit react-redux
-```
-![expo](Resources/6.png)
-
-## 5. Создание API
-Создание API в React Native подразумевает создание интерфейса для взаимодействия с сервером.
-Это обычно включает работу с REST или GraphQL API через такие библиотеки, как fetch или axios.
-
+    Содержит список устройств devices, который будет установлен в глобальное состояние.
 
 ```bash
-npm install axios
-```
-![expo](Resources/7.png)
-
-**Создание клиентского API-модуля**
-
-Создайте файл api.js для управления всеми запросами к серверу.
-
-Файл: src/api/api.js
-
-```bash
-import axios from 'axios';
-
-// Создаем экземпляр axios с базовым URL
-const apiClient = axios.create({
-  baseURL: 'https://example.com/api', // Замените на ваш URL API
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Пример методов API
-export const getPhotos = async () => {
-  try {
-    const response = await apiClient.get('/photos');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching photos:', error);
-    throw error;
+AppState appReducer(AppState state, dynamic action) {
+  if (action is SetDevicesAction) {
+    return AppState(devices: action.devices, selectedDevice: state.selectedDevice);
   }
-};
-
-export const createPhoto = async (photo) => {
-  try {
-    const response = await apiClient.post('/photos', photo);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating photo:', error);
-    throw error;
-  }
-};
+  return state;
+}
 ```
+редюсер — функция, которая принимает текущее состояние (state) и экшен (action), а затем возвращает новое состояние.
+В данном случае:
 
-**Использование API в компоненте**
+    Если получен экшен SetDevicesAction, обновляется список устройств в состоянии.
+    В противном случае возвращается текущее состояние.
 
-Теперь мы можем использовать api.js в компонентах, чтобы загружать данные.
-
-Файл: src/screens/HomeScreen.js
 
 ```bash
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-import { getPhotos } from '../api/api';
-import PhotoCard from '../components/PhotoCard';
+final store = Store<AppState>(
+  appReducer,  // Основной редюсер.
+  initialState: AppState(devices: [], selectedDevice: null), // Начальное состояние.
+);
+```
+Хранилище (Store):
 
-export default function HomeScreen() {
-  const [photos, setPhotos] = useState([]);
-  const [loading, setLoading] = useState(true);
+    Объединяет:
+        Редюсер (appReducer).
+        Начальное состояние приложения (initialState).
+    initialState:
+        devices: Пустой список.
+        selectedDevice: null.
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const data = await getPhotos();
-        setPhotos(data);
-      } catch (error) {
-        console.error('Error loading photos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+```bash
 
-    fetchPhotos();
-  }, []);
+import 'package:redux/redux.dart';
+import 'package:shopingapp/models/device.dart'; 
+class AppState {
+  final List<Device> devices;
+  final Device? selectedDevice;
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={photos}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <PhotoCard title={item.title} url={item.thumbnailUrl} />}
-      />
-    </View>
-  );
+  AppState({required this.devices, this.selectedDevice});
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 10,
+class SetDevicesAction {
+  final List<Device> devices;
+
+  SetDevicesAction(this.devices);
+}
+
+AppState appReducer(AppState state, dynamic action) {
+  if (action is SetDevicesAction) {
+    return AppState(devices: action.devices, selectedDevice: state.selectedDevice);
+  }
+  return state;
+}
+
+final store = Store<AppState>(
+  appReducer,
+  initialState: AppState(devices: [], selectedDevice: null),
+);
+```
+
+
+создаем модель устройства (Device), которая используется для представления данных об устройствах в приложении
+
+```bash
+
+class Device {
+  final int id;
+  final String title;
+  final String brand;
+  final double price;
+  final String image;
+
+  Device({
+    required this.id,
+    required this.title,
+    required this.brand,
+    required this.price,
+    required this.image,
+  });
+
+  factory Device.fromJson(Map<String, dynamic> json) {
+    return Device(
+      id: json['id'],
+      title: json['title'],
+      brand: json['brand'],
+      price: json['price'].toDouble(),
+      image: json['image'],
+    );
+  }
+}
+```
+
+
+
+
+Обновите файл shop_screen.dart:
+
+
+1. ShopScreen
+
+    Основной виджет (StatelessWidget):
+        Это главный экран, где отображается список устройств.
+        Используется StoreConnector из пакета flutter_redux, чтобы получить данные из хранилища состояния (AppState).
+
+```bash
+StoreConnector<AppState, List<Device>>(
+  converter: (store) => store.state.devices,
+```
+converter: Функция, которая преобразует данные из Redux-хранилища в список устройств devices.
+
+Добавление устройств по умолчанию (если список пуст):
+```bash
+if (devices.isEmpty) {
+  devices = [
+    Device(
+      id: 1,
+      title: 'Samsung s24 ultra',
+      price: 2000,
+      image: 'assets/images/device1.jpg',
+      brand: 'SAMSUNG',
+    ),
+    ...
+  ];
+}
+```
+Отображение списка устройств:
+```bash
+ListView.builder(
+  itemCount: devices.length,
+  itemBuilder: (context, index) {
+    final device = devices[index];
+    ...
+```
+Переход на экран деталей устройства:
+```bash
+ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DeviceDetailScreen(device: device),
+      ),
+    );
   },
-});
+  child: Text('View Details'),
+),
+```
+2. DeviceDetailScreen
+    Экран с подробностями устройства:
+```bash
+class DeviceDetailScreen extends StatelessWidget {
+  final Device device;
+
+  DeviceDetailScreen({required this.device});
 ```
 
-**Создание сервера**
-Установка <code>json-server</code>
+Отображение деталей устройства:
 ```bash
-npm install -g json-server
+Center(
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Image.asset(device.image),
+      Text('Brand: ${device.brand}'),
+      Text('Price: \$${device.price}'),
+    ],
+  ),
+),
+```
+<code>shop_screen.dart</code>
+
+```bash
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:shopingapp/models/device.dart'; 
+import 'package:shopingapp/store/store.dart'; 
+
+class ShopScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, List<Device>>(
+      converter: (store) => store.state.devices,  
+      builder: (context, devices) {
+        if (devices.isEmpty) {
+          devices = [
+            Device(
+              id: 1,
+              title: 'Samsung s24 ultra ',
+              price: 2000,
+              image: 'assets/images/device1.jpg',
+              brand: 'SAMSUNG',
+            ),
+            Device(
+              id: 2,
+              title: 'Iphone 15 pro max',
+              price: 1000,
+              image: 'assets/images/device2.jpg',
+              brand: 'IPHONE',
+            ),
+          ];
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: Text('Shop')),
+          body: ListView.builder(
+            itemCount: devices.length,
+            itemBuilder: (context, index) {
+              final device = devices[index];
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            device.image,
+                            height: 200, 
+                            fit: BoxFit.cover,  //!!! Makes the image fit the size
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          device.title,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 6),
+                        Text('${device.price} USD'),
+                        SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DeviceDetailScreen(device: device),
+                              ),
+                            );
+                          },
+                          child: Text('View Details'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DeviceDetailScreen extends StatelessWidget {
+  final Device device;
+
+  DeviceDetailScreen({required this.device});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(device.title)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(device.image),  
+            Text('Brand: ${device.brand}'),
+            Text('Price: \$${device.price}'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+Добавление зависимостей
+
+Откройте файл pubspec.yaml и добавьте необходимые пакеты для работы приложения.
+
+```bash
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_redux: ^0.8.0
+  redux: ^4.0.0
+  provider: ^6.0.0
+```
+for pics
+```bash
+flutter:
+  assets:
+    - assets/images/
 ```
 
-Создание файла <code>db.json</code>
+
+И конечно Обновите файл main.dart:
 
 ```bash
-{
-  "photos": [
-    {
-      "id": 1,
-      "title": "Sample Photo 1",
-      "url": "https://via.placeholder.com/600/92c952",
-      "thumbnailUrl": "https://via.placeholder.com/150/92c952"
-    },
-    {
-      "id": 2,
-      "title": "Sample Photo 2",
-      "url": "https://via.placeholder.com/600/771796",
-      "thumbnailUrl": "https://via.placeholder.com/150/771796"
-    }
-  ]
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:shopingapp/store/store.dart'; 
+import 'package:shopingapp/screens/shop_screen.dart';
+import 'package:shopingapp/store/sotre.dart'; 
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StoreProvider(
+      store: store,  
+      child: MaterialApp(
+        home: ShopScreen(), 
+      ),
+    );
+  }
 }
 ```
 
-***Запуск сервера:***
 
-```bash
-json-server --watch db.json --port 3000
-```
+Структура каталога lib
 
-Итоговая структура проекта
 <pre>
-src/
-├── api/
-│   └── api.js
-├── components/
-│   └── PhotoCard.js
-├── screens/
-│   └── HomeScreen.js
-├── App.js
+── lib
+│   ├── main.dart
+│   ├── models
+│   │   └── device.dart
+│   ├── screens
+│   │   └── shop_screen.dart
+│   └── store
+│       └── store.dart
 </pre>
-Итого
-1.Сервер возвращает данные (например, json-server).
-2.api.js управляет запросами.
-3.Компоненты используют useEffect для вызова API.
-4.Данные отображаются в UI через FlatList.
 
-![expo](Resources/9.png)
+**assets**
 
+<pre>
+├── assets
+│   └── images
+│       ├── device1.jpg
+│       └── device2.jpg
+</pre>
 
+![f](Resources/5.png)
+![f](Resources/6.png)
 
-
-## 6. Views
-
-В React Native View — это контейнер, который поддерживает макет с помощью Flexbox, стиль, обработку сенсорного ввода и элементы управления доступностью.
-
-```bash
-// React Native
-<FlatList
-  data={[ ... ]}
-  renderItem={({ item }) => <Text>{item.key}</Text>}
-/>
-```
-
-
-![expo](Resources/8.png)
+![f](Resources/7.png)
 
 
 
 
-# Что такой React Native и Expo и какая Разница между Expo и React Native?
 
-**Expo** и **React Native** позволяют разработчикам создавать кросс-платформенные мобильные приложения с использованием JavaScript. Однако они имеют разные подходы к разработке и отличаются в некоторых аспектах.
 
-## **React Native**:
 
-React Native — это фреймворк для разработки мобильных приложений, который позволяет писать приложения на JavaScript и React, при этом под капотом он использует **родные компоненты** для каждой платформы (iOS и Android). В React Native у вас есть гибкость для написания пользовательского кода для платформ, если это необходимо.
 
-### **Основные особенности React Native**:
-- **Гибкость**: React Native дает разработчику больше контроля. Если вам нужно использовать сторонние библиотеки или код, которого нет в Expo, вы можете сделать это напрямую в React Native.
-- **Родные модули**: Если вам нужны функции, которые не поддерживаются по умолчанию, вы можете подключить родной код (Java/Kotlin для Android, Swift/Objective-C для iOS).
-- **Процесс сборки**: Для React Native требуется настроенная среда разработки на обеих платформах (Android Studio для Android и Xcode для iOS). Сборка приложения производится с использованием инструментов, таких как `react-native-cli`.
-- **Настройка**: Вы можете настроить каждый аспект приложения, включая доступ к родным функциям и API платформы.
 
-## **Expo**:
 
-Expo — это набор инструментов и сервисов, построенных вокруг React Native, который упрощает разработку. Expo предоставляет предварительно настроенную среду, с множеством функций и API, которые позволяют разработчикам избегать настройки и быстро начинать работу с React Native.
 
-### **Основные особенности Expo**:
-- **Более высокий уровень абстракции**: Expo упрощает разработку, обрабатывая большую часть родного кода за вас. Вам не нужно беспокоиться о сложностях конфигурации iOS или Android.
-- **Управляемый рабочий процесс**: Expo предоставляет "управляемый рабочий процесс", где многие сложности работы с родным кодом скрыты. Expo предлагает компоненты и API (например, камеру, геолокацию, уведомления), которые легко интегрируются.
-- **Не нужно устанавливать Xcode или Android Studio**: Expo облегчает начинающим разработчикам переход на мобильную разработку, так как не требует установки Android Studio или Xcode. Также вы можете тестировать приложение на устройстве через **Expo Go**.
-- **Быстрая настройка**: Настройка с Expo быстрее, чем с React Native, так как требует минимальной конфигурации и автоматически управляет многими зависимостями и родными модулями.
-- **Сборка и публикация через серверы Expo**: Expo предоставляет облачные сервисы для сборки и публикации приложения без необходимости настройки локальной среды сборки для iOS и Android.
 
-## **Основные отличия**:
-
-1. **Доступ к родному коду**:
-   - **React Native**: Предоставляет полный доступ к родной среде, позволяя писать и настраивать родной код (Objective-C/Swift для iOS, Java/Kotlin для Android).
-   - **Expo**: Сосредоточено на управляемой среде с предварительно настроенными решениями. Expo предоставляет большинство необходимых функций без написания родного кода. Однако, если вам нужны кастомные модули, вам нужно будет "выйти" из Expo.
-
-2. **Опыт разработки**:
-   - **React Native**: Требует настройки среды для обеих платформ (Xcode для iOS, Android Studio для Android). С этим связано больше настроек, но и больше контроля над приложением.
-   - **Expo**: Упрощает разработку с помощью таких инструментов, как Expo CLI и Expo Go для тестирования. Экспонирует сложные платформенные детали, ускоряя процесс разработки для новичков и веб-разработчиков.
-
-3. **Кастомизация и расширяемость**:
-   - **React Native**: Вы можете использовать любые сторонние библиотеки, и если библиотека не работает, вы можете изменить или расширить её с помощью родного кода.
-   - **Expo**: Expo поставляется с набором предварительно встроенных API, но он ограничен по сравнению с React Native. Если вам нужно больше возможностей, чем те, что предоставляет Expo, вам нужно будет "выйти" из Expo.
-
-4. **Сборка и развертывание**:
-   - **React Native**: Сборка и развертывание выполняется на вашем локальном компьютере с использованием Xcode и Android Studio. Это дает больше контроля над процессом сборки.
-   - **Expo**: Expo предлагает облачные сервисы для сборки, и вам не нужно настраивать локальную среду. Однако, это может не дать такой гибкости, как работа с локальной средой сборки.
-
-5. **Производительность**:
-   - **React Native**: Вы получаете полный контроль над приложением, что позволяет оптимизировать производительность по мере необходимости, включая использование кастомных родных модулей.
-   - **Expo**: Может немного снижать производительность из-за абстракции, но для большинства приложений разница в производительности будет незначительной. Однако, если вы выйдете из Expo, то получите полный контроль над оптимизацией производительности.
-
-## **Когда использовать Expo и когда React Native**:
-
-- **Используйте Expo**, если:
-  - Вы разрабатываете относительно простое приложение и хотите начать быстро.
-  - Вам не нужно много кастомизации родного кода или сложных конфигураций.
-  - Вы предпочитаете удобство облачных сборок и упрощенное тестирование.
-  - Вы не хотите беспокоиться о специфичных для платформ настройки, таких как Xcode или Android Studio.
-
-- **Используйте React Native**, если:
-  - Вам нужен полный контроль над приложением, включая доступ к кастомным родным модулям и библиотекам.
-  - Вы хотите использовать более сложные или специфические родные функции.
-  - У вас есть опыт разработки родного кода, и вы хотите управлять всеми аспектами приложения.
-  - Ваш проект сложный и может требовать расширенных настроек.
-
-## **Eject из Expo**:
-Если вы начинаете с Expo и позже понимаете, что вам нужно больше доступа к родному коду или больше кастомизации, вы можете выполнить **eject** из Expo. Это преобразует ваше приложение в стандартный проект React Native, где у вас будет больше контроля над приложением, но вы также потеряете некоторые удобства, предоставляемые Expo.
-
-```bash
-expo eject
