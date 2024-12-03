@@ -735,26 +735,23 @@ flutter build apk --release
 
 # Создайте Django Backend для входа и регистрации
 
-1. Установите Django и настройте проект
+Установите Django и настройте проект
 
-    Установите Django:
 
-    ```bash
-    pip install django
-    ```
+```bash
+pip install django
+```
 
-    Создайте новый проект:
+Создайте новый проект:
+```bash
+django-admin startproject auth_backend
+cd auth_backend
+```
+Создайте приложение для аутентификации:
 
-    ```bash
-    django-admin startproject auth_backend
-    cd auth_backend
-    ```
-
-    Создайте приложение для аутентификации:
-
-    ```bash
-    python manage.py startapp auth_app
-    ```
+```bash
+python manage.py startapp auth_app
+````
 
     Добавьте приложение в `INSTALLED_APPS` в файле `settings.py`:
 
@@ -766,13 +763,12 @@ flutter build apk --release
     ]
     ```
 
-2. Установите Django REST Framework
+Установите Django REST Framework
 
-    Установите:
 
-    ```bash
+```bash
     pip install djangorestframework
-    ```
+```
 
     Добавьте Django REST Framework в `INSTALLED_APPS`:
 
@@ -897,7 +893,7 @@ INSTALLED_APPS = [
 `login_screen.dart`
 
 
-### 1. **Импорты**
+### **Импорты**
 ```bash
 import 'dart:convert'; // Для кодирования/декодирования JSON
 import 'package:http/http.dart' as http; // Для выполнения HTTP-запросов
@@ -914,7 +910,7 @@ class LoginScreen extends StatelessWidget {
 
 ```bash
 @override
-Widget build(BuildContext context) {
+Widget build(BuildContext context)
 ```
 Метод отвечает за построение пользовательского интерфейса.
 Возвращает виджет Scaffold, который содержит структуру экрана с полем для ввода данных и кнопками.
@@ -1073,10 +1069,9 @@ class RegisterScreen extends StatelessWidget {
 `emailController` и `passwordController` — контроллеры для полей ввода email и пароля, соответственно.
 
 Метод `build`
-
 ```bash
 @override
-Widget build(BuildContext context) {
+Widget build(BuildContext context)
 ```
 
 Метод `build` строит пользовательский интерфейс.
