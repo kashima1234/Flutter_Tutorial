@@ -712,7 +712,6 @@ Flutter SDK.
 ```bash
 flutter doctor
 ```
-
 Все пункты должны быть отмечены зелёным.
 
 ### Сборка APK в режиме Release
@@ -720,11 +719,9 @@ flutter doctor
 APK-файл для публикации нужно собирать в режиме release, чтобы исключить отладочные функции и улучшить производительность.
 
 Выполните следующую команду:
-
 ```bash
 flutter build apk --release
 ```
-
 После успешной сборки APK будет находиться в папке:
 
 <code>build/app/outputs/flutter-apk/app-release.apk</code>
@@ -735,3 +732,509 @@ flutter build apk --release
 ![f](Resources/13.png)
 ![f](Resources/14.png)
 ![f](Resources/15.png)
+
+# Создайте Django Backend для входа и регистрации
+
+1. Установите Django и настройте проект
+
+    Установите Django:
+
+    ```bash
+    pip install django
+    ```
+
+    Создайте новый проект:
+
+    ```bash
+    django-admin startproject auth_backend
+    cd auth_backend
+    ```
+
+    Создайте приложение для аутентификации:
+
+    ```bash
+    python manage.py startapp auth_app
+    ```
+
+    Добавьте приложение в `INSTALLED_APPS` в файле `settings.py`:
+
+    ```python
+    INSTALLED_APPS = [
+        ...
+        'auth_app',
+        'rest_framework',  # Для разработки API
+    ]
+    ```
+
+2. Установите Django REST Framework
+
+    Установите:
+
+    ```bash
+    pip install djangorestframework
+    ```
+
+    Добавьте Django REST Framework в `INSTALLED_APPS`:
+
+    ```python
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+    ]
+    ```
+
+`auth_app/views.py`
+
+```bash
+
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
+import json
+from .models import CustomUser
+from django.contrib.auth import get_user_model
+
+CustomUser = get_user_model()
+
+@csrf_exempt
+def register(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        password = data.get("password")
+
+        if CustomUser.objects.filter(username=email).exists():
+            return JsonResponse({"error": "User already exists"}, status=400)
+
+        # Save the user with plain_password and hashed password
+        user = CustomUser.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            plain_password=password,  # Save plain password for your specific need
+        )
+        return JsonResponse({"message": "User registered successfully"}, status=201)
+
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def login_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        password = data.get("password")
+
+        user = authenticate(username=email, password=password)
+
+        if user is not None:
+            return JsonResponse({"message": "Login successful"}, status=200)
+        else:
+            return JsonResponse({"error": "Invalid credentials"}, status=400)
+
+    return JsonResponse({"error": "Invalid method"}, status=405)
+```
+
+`auth_app/urls.py`
+```bash
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('register/', views.register, name='register'),
+    path('login/', views.login_view, name='login'),
+]
+
+]
+```
+
+`admin.py`
+```bash
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser
+
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    list_display = ('id', 'username', 'email', 'is_staff', 'is_active')
+    search_fields = ('username', 'email')
+    ordering = ('id',)
+
+```
+`models.py`
+```bash
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class CustomUser(AbstractUser):
+    plain_password = models.CharField(max_length=128, blank=True, null=True)
+
+    # Provide unique related_name values to avoid conflicts
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_groups',  # Unique related name
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_permissions',  # Unique related name
+        blank=True,
+    )
+```
+`settings.py` `INSTALLED_APPS` 
+```bash
+INSTALLED_APPS = [
+    ...
+    'auth_app',
+    'rest_framework',  # Для разработки API
+]
+```
+# Подключите свое приложение Flutter к бэкэнду
+
+в папку `screens` создаем `login_screen.dart` и `register_screen.dart`
+
+`login_screen.dart`
+
+
+### 1. **Импорты**
+```bash
+import 'dart:convert'; // Для кодирования/декодирования JSON
+import 'package:http/http.dart' as http; // Для выполнения HTTP-запросов
+import 'package:flutter/material.dart'; // Для создания пользовательского интерфейса
+```
+cоздаем классы
+
+```bash
+class LoginScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+```
+Метод `build`
+
+```bash
+@override
+Widget build(BuildContext context) {
+```
+Метод отвечает за построение пользовательского интерфейса.
+Возвращает виджет Scaffold, который содержит структуру экрана с полем для ввода данных и кнопками.
+
+Кнопка "Login"
+```bash
+ElevatedButton(
+  onPressed: () async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    if (email.isNotEmpty && password.isNotEmpty) {
+      var response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/api/auth/login/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login successful!')),
+        );
+        Navigator.pushReplacementNamed(context, '/shop');
+      } else {
+        var errorMessage = jsonDecode(response.body)['error'] ?? 'Invalid credentials';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields')),
+      );
+    }
+  },
+  child: Text('Login'),
+),
+```
+Функционал кнопки:
+Собирает данные из текстовых полей emailController и passwordController.
+Проверяет, что оба поля заполнены.
+Отправляет POST-запрос на сервер (Django API) по адресу `http://127.0.0.1:8000/api/auth/login/`.
+В заголовках указывается, что данные отправляются в формате JSON.
+Если сервер возвращает статус 200, пользователь получает сообщение об успешной авторизации и перенаправляется на экран /shop.
+Если сервер возвращает ошибку, показывается сообщение с текстом ошибки.
+<br>
+Кнопка "Register"
+
+```bash
+TextButton(
+  onPressed: () {
+    Navigator.pushNamed(context, '/register');
+  },
+  child: Text('Don\'t have an account? Register here'),
+),
+```
+Эта кнопка перенаправляет пользователя на экран регистрации /register.
+
+
+`login_screen.dart`
+
+```bash
+import 'dart:convert'; // For JSON encoding/decoding
+import 'package:http/http.dart' as http; // For HTTP requests
+import 'package:flutter/material.dart';
+
+class LoginScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                // Retrieve user input
+                String email = emailController.text.trim();
+                String password = passwordController.text.trim();
+
+                if (email.isNotEmpty && password.isNotEmpty) {
+                  // Send API request to backend
+                  var response = await http.post(
+                    Uri.parse('http://127.0.0.1:8000/api/auth/login/'), // Django API endpoint
+                    headers: {'Content-Type': 'application/json'},
+                    body: jsonEncode({
+                      'email': email,
+                      'password': password,
+                    }),
+                  );
+
+                  if (response.statusCode == 200) {
+                    // Successful login
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Login successful!')),
+                    );
+                    Navigator.pushReplacementNamed(context, '/shop'); // Navigate to Shop Screen
+                  } else {
+                    // Handle error response
+                    var errorMessage = jsonDecode(response.body)['error'] ?? 'Invalid credentials';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(errorMessage)),
+                    );
+                  }
+                } else {
+                  // Show validation error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please fill in all fields')),
+                  );
+                }
+              },
+              child: Text('Login'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/register'); // Navigate to Register Screen
+              },
+              child: Text('Don\'t have an account? Register here'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+`register_screen.dart`
+создаем класс 
+```bash
+class RegisterScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+```
+`RegisterScreen` — виджет, который отображает экран регистрации.
+`emailController` и `passwordController` — контроллеры для полей ввода email и пароля, соответственно.
+
+Метод `build`
+
+```bash
+@override
+Widget build(BuildContext context) {
+```
+
+Метод `build` строит пользовательский интерфейс.
+Возвращается виджет `Scaffold`, который содержит все элементы на экране.
+
+Кнопка "Register"
+
+```bash
+ElevatedButton(
+  onPressed: () async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    if (email.isNotEmpty && password.isNotEmpty) {
+      try {
+        var response = await http.post(
+          Uri.parse('http://127.0.0.1:8000/api/auth/register/'), // Обновите URL, если нужно
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email, 'password': password}),
+        );
+
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Account created successfully!')),
+          );
+          Navigator.pushReplacementNamed(context, '/login');
+        } else {
+          var errorMessage = jsonDecode(response.body)['error'] ?? 'Registration failed';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Something went wrong: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields')),
+      );
+    }
+  },
+  child: Text('Register'),
+),
+```
+Функциональность кнопки "Register":
+
+Когда кнопка нажата, происходит следующее:
+Собираются значения из полей emailController и passwordController.
+Проверяется, что оба поля заполнены.
+Если поля заполнены, отправляется POST-запрос на сервер для создания аккаунта. URL запроса: `http://127.0.0.1:8000/api/auth/register/`.
+В заголовках указывается, что данные отправляются в формате JSON.
+Если регистрация успешна (статус 201), показывается сообщение о успешной регистрации и пользователь перенаправляется на экран авторизации (`/login`).
+Если произошла ошибка (например, неправильные данные или уже существует аккаунт), выводится соответствующее сообщение об ошибке.
+В случае исключения (например, проблемы с интернет-соединением) также показывается сообщение об ошибке.
+
+
+```bash
+import 'dart:convert'; // For encoding/decoding JSON
+import 'package:http/http.dart' as http; // For making HTTP requests
+import 'package:flutter/material.dart';
+
+class RegisterScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Register'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+                          onPressed: () async {
+              String email = emailController.text.trim();
+              String password = passwordController.text.trim();
+
+              if (email.isNotEmpty && password.isNotEmpty) {
+                try {
+                  var response = await http.post(
+                    Uri.parse('http://127.0.0.1:8000/api/auth/register/'), // Update URL if needed
+                    headers: {'Content-Type': 'application/json'},
+                    body: jsonEncode({'email': email, 'password': password}),
+                  );
+
+                  if (response.statusCode == 201) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Account created successfully!')),
+                    );
+                    Navigator.pushReplacementNamed(context, '/login');
+                  } else {
+                    var errorMessage = jsonDecode(response.body)['error'] ?? 'Registration failed';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(errorMessage)),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Something went wrong: $e')),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Please fill in all fields')),
+                  );
+                }
+              },
+              child: Text('Register'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+структура `lib`
+<pre>
+lib/
+├── main.dart
+├── screens/
+│   ├── login_screen.dart        
+│   ├── register_screen.dart      
+</pre>
+
+
+## Проверяет
+
+![f](Resources/16.png)
+![f](Resources/17.png)
+![f](Resources/18.png)
+
+
+## django administration
+
+![f](Resources/19.png)
+
+
+## Проверяет запросы 
+
+![f](Resources/20.png)
+![f](Resources/21.png)
+
+
