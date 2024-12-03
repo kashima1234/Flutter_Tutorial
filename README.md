@@ -766,14 +766,14 @@ python manage.py startapp auth_app
     pip install djangorestframework
 ```
 
-    Добавьте Django REST Framework в `INSTALLED_APPS`:
+Добавьте Django REST Framework в `INSTALLED_APPS`:
 
-    ```python
+```python
     INSTALLED_APPS = [
         ...
         'rest_framework',
     ]
-    ```
+```
 
 `auth_app/views.py`
 
@@ -849,7 +849,7 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('id', 'username', 'email', 'is_staff', 'is_active')
+    list_display = ('id', 'username', 'email', 'is_active')
     search_fields = ('username', 'email')
     ordering = ('id',)
 
@@ -954,19 +954,6 @@ ElevatedButton(
 В заголовках указывается, что данные отправляются в формате JSON.
 Если сервер возвращает статус 200, пользователь получает сообщение об успешной авторизации и перенаправляется на экран /shop.
 Если сервер возвращает ошибку, показывается сообщение с текстом ошибки.
-<br>
-Кнопка "Register"
-
-```bash
-TextButton(
-  onPressed: () {
-    Navigator.pushNamed(context, '/register');
-  },
-  child: Text('Don\'t have an account? Register here'),
-),
-```
-Эта кнопка перенаправляет пользователя на экран регистрации /register.
-
 
 `login_screen.dart`
 
@@ -1072,8 +1059,8 @@ Widget build(BuildContext context)
 Метод `build` строит пользовательский интерфейс.
 Возвращается виджет `Scaffold`, который содержит все элементы на экране.
 
-Кнопка "Register"
 
+`register_screen.dart`
 ```bash
 ElevatedButton(
   onPressed: () async {
