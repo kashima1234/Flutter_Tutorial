@@ -708,7 +708,6 @@ Flutter SDK.
 Правильно настроенные переменные окружения (flutter и adb должны быть доступны в терминале).
 
 Проверьте работоспособность Flutter и Android SDK командой:
-
 ```bash
 flutter doctor
 ```
@@ -723,7 +722,6 @@ APK-файл для публикации нужно собирать в режи
 flutter build apk --release
 ```
 После успешной сборки APK будет находиться в папке:
-
 <code>build/app/outputs/flutter-apk/app-release.apk</code>
 
 
@@ -741,19 +739,17 @@ flutter build apk --release
 ```bash
 pip install django
 ```
-
 Создайте новый проект:
 ```bash
 django-admin startproject auth_backend
 cd auth_backend
 ```
 Создайте приложение для аутентификации:
-
 ```bash
 python manage.py startapp auth_app
-````
+```
 
-    Добавьте приложение в `INSTALLED_APPS` в файле `settings.py`:
+Добавьте приложение в `INSTALLED_APPS` в файле `settings.py`:
 
     ```python
     INSTALLED_APPS = [
@@ -907,7 +903,6 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
 ```
 Метод `build`
-
 ```bash
 @override
 Widget build(BuildContext context)
